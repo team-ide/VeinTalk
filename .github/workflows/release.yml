@@ -10,15 +10,55 @@ on:
     # paths: [ "package.json" ]
 jobs:
   code:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      # 下载源码
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
         with:
-          repository: 'VeinTalk/VeinTalkCode'
+          repository: ${{ secrets.VEIN_TALK_CODE }}
           token: ${{ secrets.VEIN_TALK_ACCESS_TOKEN }}
           # ssh-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          # path: './code'  # 指定源码存放目录
+          fetch-depth: 0 # 获取完整提交历史
 
+      - name: Extract version and notes
+        id: changelog
+        run: |
+          # 提取第一个版本号
+          VERSION=$(awk '/^## \[v?[0-9]+\.[0-9]+\.[0-9]+]/ {print $2; exit}' CHANGELOG.md | tr -d '[]')
+          echo "Extracted version: $VERSION"
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
 
-      - run: |
-          ls ./ -l
+          # 提取该版本的发布说明
+          NOTES=$(awk -v version="$VERSION" '
+            $0 ~ "## \\[" version "\\]" {flag=1; next}
+            $0 ~ "## \\[" && flag {exit}
+            flag {print}
+          ' CHANGELOG.md)
+
+          # 存储为多行输出
+          delimiter="EOF_$(date +%s)"
+          echo "notes<<$delimiter" >> $GITHUB_OUTPUT
+          echo "$NOTES" >> $GITHUB_OUTPUT
+          echo "$delimiter" >> $GITHUB_OUTPUT
+
+      - name: Check release
+        id: checkRelease
+        run: |
+          echo "version ${{ env.VERSION }}"
+          echo "::set-output name=RELEASE_STATUS::$(curl -I -m 10 -o /dev/null -s -w %{http_code} https://github.com/VeinTalk/VeinTalk/releases/tag/v${{ env.VERSION }})"
+ 
+
+      - name: Create Release
+        uses: actions/create-release@v1
+        if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
+          body: ${{ steps.changelog.outputs.notes }}
+          draft: true # 是否是草稿
+          prerelease: false # 是否是预发布
+
