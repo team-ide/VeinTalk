@@ -101,6 +101,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
           asset_path: hub-amd64-${{env.VERSION}}.zip
           asset_name: hub-amd64-${{env.VERSION}}.zip # 上传后的文件名
           asset_content_type: application/zip
@@ -109,6 +111,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
           asset_path: hub-arm64-${{env.VERSION}}.zip
           asset_name: hub-arm64-${{env.VERSION}}.zip # 上传后的文件名
           asset_content_type: application/zip
