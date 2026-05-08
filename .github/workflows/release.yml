@@ -102,32 +102,10 @@ jobs:
           zip -q -r hub-arm64-${{env.VERSION}}.zip hub-arm64-${{env.VERSION}}
           ls
 
-      
-      # 上传 到 Release
-      - if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          tag_name: ${{ env.VERSION }}
-          release_name: Release ${{ env.VERSION }}
-          asset_path: hub-amd64-${{env.VERSION}}.zip
-          asset_name: hub-amd64-${{env.VERSION}}.zip # 上传后的文件名
-          asset_content_type: application/zip
-      - if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
-        with:
-          tag_name: ${{ env.VERSION }}
-          release_name: Release ${{ env.VERSION }}
-          asset_path: hub-arm64-${{env.VERSION}}.zip
-          asset_name: hub-arm64-${{env.VERSION}}.zip # 上传后的文件名
-          asset_content_type: application/zip
-
       - name: Create Release
-        uses: actions/create-release@v1
+        id: create_release
         if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
@@ -137,3 +115,23 @@ jobs:
           draft: true # 是否是草稿
           prerelease: false # 是否是预发布
 
+
+      # 上传 到 Release
+      - if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: hub-amd64-${{env.VERSION}}.zip
+          asset_name: hub-amd64-${{env.VERSION}}.zip # 上传后的文件名
+          asset_content_type: application/zip
+      - if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: hub-arm64-${{env.VERSION}}.zip
+          asset_name: hub-arm64-${{env.VERSION}}.zip # 上传后的文件名
+          asset_content_type: application/zip
