@@ -49,6 +49,69 @@ jobs:
           echo "version ${{ env.VERSION }}"
           echo "::set-output name=RELEASE_STATUS::$(curl -I -m 10 -o /dev/null -s -w %{http_code} https://github.com/team-ide/VeinTalk/releases/tag/v${{ env.VERSION }})"
  
+      - name: Install Node and NPM
+        if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      - name: Set up QEMU
+        if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker
+        if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
+        uses: docker/setup-buildx-action@v1
+
+      - run: |
+          ls
+          chmod +x cmd/build-html.sh
+          ./cmd/build-html.sh
+
+      - name: Pull linux-amd64
+        run: docker pull --platform linux/amd64 teamide/build-golang:amd64-1.24.6
+
+      - name: Build linux-amd64
+        run: |
+          ls
+          chmod +x cmd/build-amd64.sh
+          docker run --platform linux/amd64 -v $(pwd):/build teamide/build-golang:amd64-1.24.6 /bin/sh /build/cmd/build-amd64.sh
+
+      - name: Pull linux-arm64
+        run: docker pull --platform linux/arm64 teamide/build-golang:arm64-1.24.6
+
+      - name: Build linux-arm64
+        run: |
+          ls
+          chmod +x cmd/build-arm64.sh
+          docker run --platform linux/arm64 -v $(pwd):/build teamide/build-golang:arm64-1.24.6 /bin/sh /build/cmd/build-arm64.sh
+
+      - run: |
+          ls
+          mv release/hub-amd64 hub-amd64-${{env.VERSION}}
+          zip -q -r hub-amd64-${{env.VERSION}}.zip hub-amd64-${{env.VERSION}}
+          mv release/hub-arm64 hub-arm64-${{env.VERSION}}
+          zip -q -r hub-arm64-${{env.VERSION}}.zip hub-arm64-${{env.VERSION}}
+          ls
+
+      
+      # 上传 到 Release
+      - if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          asset_path: hub-amd64-${{env.VERSION}}.zip
+          asset_name: hub-amd64-${{env.VERSION}}.zip # 上传后的文件名
+          asset_content_type: application/zip
+      - if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+        with:
+          asset_path: hub-arm64-${{env.VERSION}}.zip
+          asset_name: hub-arm64-${{env.VERSION}}.zip # 上传后的文件名
+          asset_content_type: application/zip
 
       - name: Create Release
         uses: actions/create-release@v1
