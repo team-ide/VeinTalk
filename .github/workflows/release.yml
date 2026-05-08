@@ -47,14 +47,14 @@ jobs:
         id: checkRelease
         run: |
           echo "version ${{ env.VERSION }}"
-          echo "::set-output name=RELEASE_STATUS::$(curl -I -m 10 -o /dev/null -s -w %{http_code} https://github.com/VeinTalk/VeinTalk/releases/tag/v${{ env.VERSION }})"
+          echo "::set-output name=RELEASE_STATUS::$(curl -I -m 10 -o /dev/null -s -w %{http_code} https://github.com/team-ide/VeinTalk/releases/tag/v${{ env.VERSION }})"
  
 
       - name: Create Release
         uses: actions/create-release@v1
         if: ${{ steps.checkRelease.outputs.RELEASE_STATUS == 404 }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
         with:
           tag_name: ${{ env.VERSION }}
           release_name: Release ${{ env.VERSION }}
