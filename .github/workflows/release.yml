@@ -87,7 +87,7 @@ jobs:
           docker run --platform linux/arm64 -v $(pwd):/build teamide/build-golang:arm64-1.24.6 /bin/sh /build/cmd/build-arm64.sh
 
       - run: |
-          ls
+          ls release
           mv release/hub-amd64 hub-amd64-${{env.VERSION}}
           zip -q -r hub-amd64-${{env.VERSION}}.zip hub-amd64-${{env.VERSION}}
           mv release/hub-arm64 hub-arm64-${{env.VERSION}}
