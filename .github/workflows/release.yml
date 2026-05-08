@@ -64,6 +64,14 @@ jobs:
         uses: docker/setup-buildx-action@v1
 
       - run: |
+          mkdir -p release/html
+          mkdir -p release/hub-amd64
+          mkdir -p release/im-amd64
+          mkdir -p release/sdk-amd64
+          mkdir -p release/hub-arm64
+          mkdir -p release/im-arm64
+          mkdir -p release/sdk-arm64
+      - run: |
           ls
           chmod +x cmd/build-html.sh
           ./cmd/build-html.sh
