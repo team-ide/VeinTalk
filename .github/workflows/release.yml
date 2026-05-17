@@ -85,8 +85,8 @@ jobs:
           mkdir -p code/release/sdk-arm64
       - run: |
           ls
-          chmod +x code/cmd/build-html.sh
-          ./code/cmd/build-html.sh
+          chmod +x code/cmd/build/build-html.sh
+          ./code/cmd/build/build-html.sh
 
       - name: Pull linux-amd64
         run: docker pull --platform linux/amd64 teamide/build-golang:amd64-1.24.6
@@ -95,7 +95,7 @@ jobs:
         run: |
           ls
           chmod +x code/cmd/build-amd64.sh
-          docker run --platform linux/amd64 -v $(pwd):/build teamide/build-golang:amd64-1.24.6 /bin/sh /build/code/cmd/build-amd64.sh
+          docker run --platform linux/amd64 -v $(pwd):/build teamide/build-golang:amd64-1.24.6 /bin/sh /build/code/cmd/build/build-amd64.sh
 
       - name: Pull linux-arm64
         run: docker pull --platform linux/arm64 teamide/build-golang:arm64-1.24.6
@@ -104,7 +104,7 @@ jobs:
         run: |
           ls
           chmod +x code/cmd/build-arm64.sh
-          docker run --platform linux/arm64 -v $(pwd):/build teamide/build-golang:arm64-1.24.6 /bin/sh /build/code/cmd/build-arm64.sh
+          docker run --platform linux/arm64 -v $(pwd):/build teamide/build-golang:arm64-1.24.6 /bin/sh /build/code/cmd/build/build-arm64.sh
 
       - run: |
           mv code/release release
