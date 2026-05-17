@@ -94,7 +94,7 @@ jobs:
       - name: Build linux-amd64
         run: |
           ls
-          chmod +x code/cmd/build-amd64.sh
+          chmod +x code/cmd/build/build-amd64.sh
           docker run --platform linux/amd64 -v $(pwd):/build teamide/build-golang:amd64-1.24.6 /bin/sh /build/code/cmd/build/build-amd64.sh
 
       - name: Pull linux-arm64
@@ -103,7 +103,7 @@ jobs:
       - name: Build linux-arm64
         run: |
           ls
-          chmod +x code/cmd/build-arm64.sh
+          chmod +x code/cmd/build/build-arm64.sh
           docker run --platform linux/arm64 -v $(pwd):/build teamide/build-golang:arm64-1.24.6 /bin/sh /build/code/cmd/build/build-arm64.sh
 
       - run: |
