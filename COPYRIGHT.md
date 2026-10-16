@@ -25,7 +25,9 @@ vein-talk 为**商业专有软件（Proprietary Software）**，源码不公开�
 
 联系方式：QQ群（扫码添加）
 
-![QQ群](images/contact/qq-group-qr.jpg)
+<div align="center">
+  <img src="images/contact/qq-group-qr.jpg" alt="QQ群" width="220"/>
+</div>
 
 
 ## 四、许可条款（过渡版）

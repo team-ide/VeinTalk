@@ -147,7 +147,9 @@
 
 QQ（扫码添加）：
 
-![QQ群](images/contact/qq-group-qr.jpg)
+<div align="center">
+  <img src="images/contact/qq-group-qr.jpg" alt="QQ群" width="220"/>
+</div>
 
 ## 版权
 
